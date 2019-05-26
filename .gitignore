@@ -1,0 +1,15 @@
+# Idea Generated files
+*.ipr
+*.iml
+*.iws
+.idea/*
+*/.idea/
+*.DS_Store
+
+# Compiled/Generated files
+*.jar
+*.war
+*.class
+*/target/*
+*/*/target/*
+*/*/*/target/*

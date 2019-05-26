@@ -1,0 +1,17 @@
+server:
+  applicationConnectors:
+    - type: http
+      port: 7710
+      acceptorThreads: 2
+      selectorThreads: 4
+  adminConnectors:
+    - type: http
+      port: 7711
+
+logging:
+  level: INFO
+  appenders:
+    - type: console
+      threshold: ALL
+      timeZone: UTC
+      target: stdout
