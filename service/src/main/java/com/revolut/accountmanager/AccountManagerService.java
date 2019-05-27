@@ -2,17 +2,11 @@ package com.revolut.accountmanager;
 
 import com.hubspot.dropwizard.guice.GuiceBundle;
 import com.revolut.accountmanager.config.ServiceConfiguration;
-import com.revolut.accountmanager.factory.ActionFactory;
 import com.revolut.accountmanager.module.ServiceModule;
-import com.revolut.model.entity.CurrencyType;
-import com.revolut.model.requests.AccountDepositRequest;
-import com.revolut.model.requests.AccountRegisterRequest;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import lombok.extern.slf4j.Slf4j;
-
-import java.math.BigDecimal;
 
 @Slf4j
 public class AccountManagerService extends Application<ServiceConfiguration> {
