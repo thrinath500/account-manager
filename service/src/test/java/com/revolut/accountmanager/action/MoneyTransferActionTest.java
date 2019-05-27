@@ -21,11 +21,19 @@ public class MoneyTransferActionTest {
     Account fromAccount;
     Account toAccount;
 
+    Account accountA;
+    Account accountB;
+    Account accountC;
+
     @Before
     public void setup(){
         accountDao = new AccountRepository();
         fromAccount = accountDao.create(new AccountRegisterRequest("firstName1", "lastName1", "address1"));
         toAccount = accountDao.create(new AccountRegisterRequest("firstName2", "lastName2", "address2"));
+
+        accountA = accountDao.create(new AccountRegisterRequest("firstNameA", "lastNameA", "addressA"));
+        accountB = accountDao.create(new AccountRegisterRequest("firstNameB", "lastNameB", "addressB"));
+        accountC = accountDao.create(new AccountRegisterRequest("firstNameC", "lastNameC", "addressC"));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -47,9 +55,6 @@ public class MoneyTransferActionTest {
     public void testDeadlockCase1() throws InterruptedException {
         // Transaction flow
         // AccountA -> AccountB , AccountB -> AccountA
-
-        Account accountA = accountDao.create(new AccountRegisterRequest("firstNameA", "lastNameA", "addressA"));
-        Account accountB = accountDao.create(new AccountRegisterRequest("firstNameB", "lastNameB", "addressB"));
 
         new AccountDepositAction(accountDao, accountA.getAccountId()).
                 execute(new AccountDepositRequest(CurrencyType.EURO, new BigDecimal(1000)));
@@ -79,10 +84,6 @@ public class MoneyTransferActionTest {
         // Transaction flow
         // AccountA -> AccountB , AccountB -> AccountC
 
-        Account accountA = accountDao.create(new AccountRegisterRequest("firstNameA", "lastNameA", "addressA"));
-        Account accountB = accountDao.create(new AccountRegisterRequest("firstNameB", "lastNameB", "addressB"));
-        Account accountC = accountDao.create(new AccountRegisterRequest("firstNameB", "lastNameB", "addressB"));
-
         new AccountDepositAction(accountDao, accountA.getAccountId()).
                 execute(new AccountDepositRequest(CurrencyType.US_DOLLAR, new BigDecimal(1000)));
         new AccountDepositAction(accountDao, accountB.getAccountId()).
@@ -105,5 +106,32 @@ public class MoneyTransferActionTest {
         assertEquals(990, accountA.getBalance().get(CurrencyType.US_DOLLAR).intValue());
         assertEquals(90, accountB.getBalance().get(CurrencyType.US_DOLLAR).intValue());
         assertEquals(20, accountC.getBalance().get(CurrencyType.US_DOLLAR).intValue());
+    }
+
+    @Test
+    public void testDeadlockCase2Extrapolated() throws InterruptedException {
+        new AccountDepositAction(accountDao, accountA.getAccountId()).
+                execute(new AccountDepositRequest(CurrencyType.INR, new BigDecimal(1000)));
+        new AccountDepositAction(accountDao, accountB.getAccountId()).
+                execute(new AccountDepositRequest(CurrencyType.INR, new BigDecimal(2000)));
+
+        for(int i=0; i< 100; i++ ){
+            Thread thread1 = new Thread(() -> {
+                new MoneyTransferAction(accountDao).execute(new MoneyTransferRequest(CurrencyType.INR, new BigDecimal(9),
+                        accountA.getAccountId(), accountB.getAccountId()));
+            });
+            Thread thread2 = new Thread(() -> {
+                new MoneyTransferAction(accountDao).execute(new MoneyTransferRequest(CurrencyType.INR, new BigDecimal(20),
+                        accountB.getAccountId(), accountC.getAccountId()));
+            });
+
+            thread1.start();
+            thread2.start();
+            thread1.join();
+            thread2.join();
+        }
+        assertEquals(100, accountA.getBalance().get(CurrencyType.INR).intValue());
+        assertEquals(900, accountB.getBalance().get(CurrencyType.INR).intValue());
+        assertEquals(2000, accountC.getBalance().get(CurrencyType.INR).intValue());
     }
 }
