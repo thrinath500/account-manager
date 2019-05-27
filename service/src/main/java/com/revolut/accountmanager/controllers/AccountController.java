@@ -1,11 +1,12 @@
 package com.revolut.accountmanager.controllers;
 
 import com.revolut.accountmanager.factory.ActionFactory;
+import com.revolut.model.RequestContainer;
 import com.revolut.model.entity.AccountView;
 import com.revolut.model.requests.AccountDepositRequest;
 import com.revolut.model.requests.AccountRegisterRequest;
 import com.revolut.model.requests.AccountWithdrawRequest;
-import com.revolut.model.responses.ServiceError;
+import com.revolut.model.responses.AccountStatementResponse;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -49,32 +50,48 @@ public class AccountController {
 
     @POST
     @Path("/{accountId}/deposit")
-    public Response deposit(@PathParam("accountId") Integer accountId, @Valid AccountDepositRequest accountDepositRequest){
+    public Response deposit(@NotNull @HeaderParam("X-Request-Id") String requestId,
+                            @PathParam("accountId") Integer accountId,
+                            @Valid AccountDepositRequest accountDepositRequest){
         try{
+            RequestContainer.set(requestId);
             AccountView account = actionFactory.accountDepositAction(accountId).process(accountDepositRequest);
             return Response.ok(account).build();
         }catch (Exception e){
             return handleException(e);
+        }finally {
+            RequestContainer.clear();
         }
     }
 
     @POST
     @Path("/{accountId}/withdraw")
-    public Response withdraw(@PathParam("accountId") Integer accountId, @Valid AccountWithdrawRequest accountWithdrawRequest){
+    public Response withdraw(@NotNull @HeaderParam("X-Request-Id") String requestId,
+                             @PathParam("accountId") Integer accountId,
+                             @Valid AccountWithdrawRequest accountWithdrawRequest){
         try{
+            RequestContainer.set(requestId);
             AccountView account = actionFactory.accountWithdrawAction(accountId).process(accountWithdrawRequest);
             return Response.ok(account).build();
         }catch (Exception e){
             return handleException(e);
+        }finally {
+            RequestContainer.clear();
         }
     }
 
     @GET
     @Path("/{accountId}/statement")
     // Ignoring the paginated way of responding in case of too many records !
-    // TODO : to implement this
-    public Response statement(@PathParam("accountId") String accountId){
-        return null;
+    public Response statement(@PathParam("accountId") Integer accountId){
+        try{
+            AccountStatementResponse statementResponse = actionFactory.viewStatementAction().process(accountId);
+            return Response.ok(statementResponse).build();
+        }catch (Exception e){
+            return handleException(e);
+        }finally {
+            RequestContainer.clear();
+        }
     }
 
 }

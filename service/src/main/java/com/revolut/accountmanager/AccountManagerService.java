@@ -36,13 +36,5 @@ public class AccountManagerService extends Application<ServiceConfiguration> {
 
     public static void main(String[] args) throws Exception {
         new AccountManagerService().run(args);
-
-        // Loading test data
-        ActionFactory actionFactory = guiceBundle.getInjector().getInstance(ActionFactory.class);
-        actionFactory.accountRegistrationAction().process(new AccountRegisterRequest("User1", "LastName1", "Address1"));
-        actionFactory.accountRegistrationAction().process(new AccountRegisterRequest("User2", "LastName2", "Address2"));
-
-        actionFactory.accountDepositAction(1).process(new AccountDepositRequest(CurrencyType.INR, new BigDecimal(100.0)));
-        actionFactory.accountDepositAction(2).process(new AccountDepositRequest(CurrencyType.INR, new BigDecimal(1250.0)));
     }
 }

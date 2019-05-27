@@ -1,5 +1,6 @@
 package com.revolut.accountmanager.action;
 
+import com.revolut.model.RequestContainer;
 import com.revolut.model.entity.CurrencyType;
 import com.revolut.model.requests.AccountDepositRequest;
 import com.revolut.model.requests.AccountRegisterRequest;
@@ -8,6 +9,7 @@ import com.revoult.model.dao.IAccountDao;
 import com.revoult.model.dao.entity.Account;
 import com.revoult.model.dao.impl.AccountRepository;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -19,6 +21,11 @@ public class AccountActionTest {
     IAccountDao accountDao;
     Account account;
     AccountDepositAction accountDepositAction;
+
+    @BeforeClass
+    public static void setupClass(){
+        RequestContainer.setTestEnv();
+    }
 
     @Before
     public void setup(){
@@ -58,6 +65,7 @@ public class AccountActionTest {
 
         @Override
         public void run(){
+            RequestContainer.setTestEnv();
             for(int i = 0; i < 10; i ++){
                 if(i%2 == 0) {
                     accountWithdrawalAction.execute(new AccountWithdrawRequest(CurrencyType.INR, new BigDecimal(10.1)));

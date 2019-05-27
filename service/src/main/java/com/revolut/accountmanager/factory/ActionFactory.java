@@ -18,6 +18,10 @@ public class ActionFactory {
         return new ViewAccountAction(accountDao);
     }
 
+    public ViewStatementAction viewStatementAction(){
+        return new ViewStatementAction(accountDao);
+    }
+
     public AccountDepositAction accountDepositAction(Integer accountId){
         return new AccountDepositAction(accountDao, accountId);
     }

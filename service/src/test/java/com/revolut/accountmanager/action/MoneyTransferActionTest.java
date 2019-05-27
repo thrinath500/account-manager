@@ -1,5 +1,6 @@
 package com.revolut.accountmanager.action;
 
+import com.revolut.model.RequestContainer;
 import com.revolut.model.entity.CurrencyType;
 import com.revolut.model.requests.AccountDepositRequest;
 import com.revolut.model.requests.AccountRegisterRequest;
@@ -24,6 +25,11 @@ public class MoneyTransferActionTest {
     Account accountA;
     Account accountB;
     Account accountC;
+
+    @BeforeClass
+    public static void setupClass(){
+        RequestContainer.setTestEnv();
+    }
 
     @Before
     public void setup(){
@@ -62,10 +68,12 @@ public class MoneyTransferActionTest {
                 execute(new AccountDepositRequest(CurrencyType.EURO, new BigDecimal(100)));
 
         Thread thread1 = new Thread(() -> {
+            RequestContainer.setTestEnv();
             new MoneyTransferAction(accountDao).execute(new MoneyTransferRequest(CurrencyType.EURO, new BigDecimal(10),
                     accountA.getAccountId(), accountB.getAccountId()));
         });
         Thread thread2 = new Thread(() -> {
+            RequestContainer.setTestEnv();
             new MoneyTransferAction(accountDao).execute(new MoneyTransferRequest(CurrencyType.EURO, new BigDecimal(20),
                     accountB.getAccountId(), accountA.getAccountId()));
         });
@@ -90,10 +98,12 @@ public class MoneyTransferActionTest {
                 execute(new AccountDepositRequest(CurrencyType.US_DOLLAR, new BigDecimal(100)));
 
         Thread thread1 = new Thread(() -> {
+            RequestContainer.setTestEnv();
             new MoneyTransferAction(accountDao).execute(new MoneyTransferRequest(CurrencyType.US_DOLLAR, new BigDecimal(10),
                     accountA.getAccountId(), accountB.getAccountId()));
         });
         Thread thread2 = new Thread(() -> {
+            RequestContainer.setTestEnv();
             new MoneyTransferAction(accountDao).execute(new MoneyTransferRequest(CurrencyType.US_DOLLAR, new BigDecimal(20),
                     accountB.getAccountId(), accountC.getAccountId()));
         });
@@ -117,10 +127,12 @@ public class MoneyTransferActionTest {
 
         for(int i=0; i< 100; i++ ){
             Thread thread1 = new Thread(() -> {
+                RequestContainer.setTestEnv();
                 new MoneyTransferAction(accountDao).execute(new MoneyTransferRequest(CurrencyType.INR, new BigDecimal(9),
                         accountA.getAccountId(), accountB.getAccountId()));
             });
             Thread thread2 = new Thread(() -> {
+                RequestContainer.setTestEnv();
                 new MoneyTransferAction(accountDao).execute(new MoneyTransferRequest(CurrencyType.INR, new BigDecimal(20),
                         accountB.getAccountId(), accountC.getAccountId()));
             });

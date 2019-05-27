@@ -1,8 +1,10 @@
 package com.revoult.model.dao.entity;
 
+import com.revolut.model.RequestContainer;
 import com.revolut.model.entity.CurrencyType;
 import com.revolut.model.requests.AccountDepositRequest;
 import com.revolut.model.requests.AccountWithdrawRequest;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -11,6 +13,11 @@ import java.util.Date;
 import static org.junit.Assert.*;
 
 public class AccountTest {
+
+    @BeforeClass
+    public static void setupClass(){
+        RequestContainer.setTestEnv();
+    }
 
     @Test
     public void creationTest() {

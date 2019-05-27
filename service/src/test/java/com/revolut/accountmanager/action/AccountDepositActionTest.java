@@ -1,11 +1,13 @@
 package com.revolut.accountmanager.action;
 
+import com.revolut.model.RequestContainer;
 import com.revolut.model.entity.CurrencyType;
 import com.revolut.model.requests.AccountDepositRequest;
 import com.revolut.model.requests.AccountRegisterRequest;
 import com.revoult.model.dao.IAccountDao;
 import com.revoult.model.dao.entity.Account;
 import com.revoult.model.dao.impl.AccountRepository;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -13,6 +15,11 @@ import java.math.BigDecimal;
 import static org.junit.Assert.*;
 
 public class AccountDepositActionTest {
+
+    @BeforeClass
+    public static void setupClass(){
+        RequestContainer.setTestEnv();
+    }
 
     @Test
     public void testMultiThread() throws InterruptedException {
@@ -42,6 +49,7 @@ public class AccountDepositActionTest {
 
         @Override
         public void run(){
+            RequestContainer.setTestEnv();
             for(int i = 0; i < 10; i ++){
                 if(i%2 == 0) {
                     accountDepositAction.execute(new AccountDepositRequest(CurrencyType.INR, new BigDecimal(10)));
