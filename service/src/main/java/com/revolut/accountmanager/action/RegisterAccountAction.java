@@ -1,6 +1,5 @@
 package com.revolut.accountmanager.action;
 
-import com.google.common.base.Preconditions;
 import com.revolut.model.entity.AccountView;
 import com.revolut.model.requests.AccountRegisterRequest;
 import com.revoult.model.dao.IAccountDao;

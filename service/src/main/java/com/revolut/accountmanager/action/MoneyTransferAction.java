@@ -3,6 +3,8 @@ package com.revolut.accountmanager.action;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.revolut.accountmanager.exception.UnableToAcquireLockException;
+import com.revolut.accountmanager.util.LockUtils;
 import com.revolut.model.entity.CurrencyType;
 import com.revolut.model.requests.AccountDepositRequest;
 import com.revolut.model.requests.MoneyTransferRequest;
@@ -14,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class MoneyTransferAction extends BaseAction<MoneyTransferRequest, Void> {
@@ -62,30 +65,35 @@ public class MoneyTransferAction extends BaseAction<MoneyTransferRequest, Void> 
         List<Integer> accountIds = Lists.newArrayList(accountMap.keySet());
         Collections.sort(accountIds);
 
-        // Locking on first a/c
-        accountMap.get(accountIds.get(0)).getLock().lock();
         try{
-            // Locking on second a/c
-            accountMap.get(accountIds.get(1)).getLock().lock();
-            try {
-                fromAccount.withdrawRequestConsumer.accept(new AccountWithdrawRequest(transferRequest.getCurrencyType(),
-                        transferRequest.getValue()));
-                try{
-                    toAccount.depositRequestConsumer.accept(new AccountDepositRequest(transferRequest.getCurrencyType(),
+            // Locking on first a/c
+            accountMap.get(accountIds.get(0)).getLock().tryLock(LockUtils.MAX_LOCK_WAIT_TIME_MILLIS, TimeUnit.MILLISECONDS);
+            try{
+                // Locking on second a/c
+                accountMap.get(accountIds.get(1)).getLock().tryLock(LockUtils.MAX_LOCK_WAIT_TIME_MILLIS, TimeUnit.MILLISECONDS);
+                try {
+                    fromAccount.withdrawRequestConsumer.accept(new AccountWithdrawRequest(transferRequest.getCurrencyType(),
                             transferRequest.getValue()));
-                }catch (Exception e){
-                    log.error("Withdrawal is success, where as deposit is failed.");
-                    // Fixing the state. If some reason, this failed, we will have to reconcile by sidelining
-                    fromAccount.depositRequestConsumer.accept(new AccountDepositRequest(transferRequest.getCurrencyType(),
-                            transferRequest.getValue()));
+                    try{
+                        toAccount.depositRequestConsumer.accept(new AccountDepositRequest(transferRequest.getCurrencyType(),
+                                transferRequest.getValue()));
+                    }catch (Exception e){
+                        log.error("Withdrawal is success, where as deposit is failed.");
+                        // Fixing the state. If some reason, this failed, we will have to reconcile by sidelining
+                        fromAccount.depositRequestConsumer.accept(new AccountDepositRequest(transferRequest.getCurrencyType(),
+                                transferRequest.getValue()));
+                    }
+                }finally {
+                    // unlocking first on second a/c
+                    accountMap.get(accountIds.get(1)).getLock().unlock();
                 }
             }finally {
-                // unlocking first on second a/c
-                accountMap.get(accountIds.get(1)).getLock().unlock();
+                // unlocking last on first a/c
+                accountMap.get(accountIds.get(0)).getLock().unlock();
             }
-        }finally {
-            // unlocking last on first a/c
-            accountMap.get(accountIds.get(0)).getLock().unlock();
+        }catch (InterruptedException ie){
+            log.error("Unable to acquire lock after max waiting time", ie);
+            throw new UnableToAcquireLockException("Unable to acquire lock after max waiting time");
         }
         return null;
     }
