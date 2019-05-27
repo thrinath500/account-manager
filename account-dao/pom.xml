@@ -17,6 +17,11 @@
             <artifactId>account-model</artifactId>
             <version>${account.model.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

@@ -24,11 +24,22 @@
         <account.model.version>1.0-SNAPSHOT</account.model.version>
         <account.dao.version>1.0-SNAPSHOT</account.dao.version>
 
+        <dropwizard.version>1.0.0</dropwizard.version>
         <lombok.version>1.16.4</lombok.version>
-        <guice.version>4.0.0</guice.version>
+        <guice.version>4.0</guice.version>
         <guava.version>18.0</guava.version>
         <junit.version>4.12</junit.version>
+        <jdk.version>1.8</jdk.version>
     </properties>
+
+    <dependencies>
+        <!--Test dependencies-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+    </dependencies>
 
     <dependencyManagement>
         <dependencies>
@@ -50,12 +61,22 @@
                 <version>${guice.version}</version>
             </dependency>
 
-            <!--Test dependencies-->
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.2</version>
+                    <configuration>
+                        <source>${jdk.version}</source>
+                        <target>${jdk.version}</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
