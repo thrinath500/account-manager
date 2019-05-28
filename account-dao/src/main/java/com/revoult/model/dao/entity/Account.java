@@ -61,7 +61,7 @@ public class Account {
     public Consumer<AccountDepositRequest> depositRequestConsumer = new Consumer<AccountDepositRequest>() {
         @Override
         public void accept(AccountDepositRequest accountDepositRequest) {
-            if(!RequestContainer.isTestEnv() && requestIdToAuditEntryMap.containsKey(RequestContainer.get())){
+            if(isAlreadyExecuted()){
                 log.warn("RequestId is already processed " + RequestContainer.get());
                 return;
             }
@@ -78,7 +78,7 @@ public class Account {
     public Consumer<AccountWithdrawRequest> withdrawRequestConsumer = new Consumer<AccountWithdrawRequest>() {
         @Override
         public void accept(AccountWithdrawRequest withdrawRequest) {
-            if(!RequestContainer.isTestEnv() && requestIdToAuditEntryMap.containsKey(RequestContainer.get())){
+            if(isAlreadyExecuted()){
                 log.warn("RequestId is already processed " + RequestContainer.get());
                 return;
             }
@@ -105,6 +105,11 @@ public class Account {
                 createdAt(createdAt).
                 updatedAt(updatedAt).
                 build();
+    }
+
+    // Idempotency check : Checks if the request is already served in past
+    public boolean isAlreadyExecuted(){
+        return !RequestContainer.isTestEnv() && requestIdToAuditEntryMap.containsKey(RequestContainer.get());
     }
 
     public Map<CurrencyType, BigDecimal> getBalance() {

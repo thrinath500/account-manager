@@ -12,8 +12,17 @@ service : Dropwizard rest service for exposing APIs
 ThreadLocal maintaining Idempotency acroos same requests [RequestContainer.class]
 2. Reentrant lock is used for handling critical sections in concurrent scenarios [Account.class]
 
+### Libraries used
+1. Dropwizard - For REST 
+2. Guice - Dependency Injection
+3. Guava - Collection utilties
+4. Lombok - Auto generate code
+5. Junit - Test cases. Intentionally not used Mockito & PowerMockito Frameworks, to keep it lightweight
+
 ### Build steps:
 Maven project. Uses dependncy management to maintain the same versions across all child modules
+Whole project is bundled into one single jar using shade plugin
+JDK version is 1.8
 
 ```sh
 git clone git@github.com:thrinath500/account-manager.git
@@ -24,6 +33,7 @@ mvn clean install
 ### Run steps:
 
 ```sh
+mkdir -p /var/log/com/revolut/accountmanager/
 java -cp service/target/service-1.0-SNAPSHOT.jar com.revolut.accountmanager.AccountManagerService server service/service.yml
 ```
 
@@ -34,15 +44,15 @@ Service starts up with default test data. However you can load your test data ag
 1. Registering a account
 
 ```sh
-curl -X PUT \
+curl -w"\n" -X PUT \
   http://localhost:9000/v1/account/ \
   -H 'content-type: application/json' \
   -d '{"firstName" : "Thrinath2","lastName":"Dosapati2","address" : "Banglore"}'
 ```
 
-2. Deposting to an account
+2. Depositing to an account
 ```sh
-curl -X POST \
+curl -w"\n" -X POST \
   http://localhost:9000/v1/account/1/deposit \
   -H 'content-type: application/json' \
   -H 'x-request-id: 123' \
@@ -51,22 +61,22 @@ curl -X POST \
 
 3. Viewing an account
 ```sh
-curl -X GET http://localhost:9000/v1/account/1 \
+curl -w"\n" -X GET http://localhost:9000/v1/account/1 \
   -H 'content-type: application/json' 
 ```
 
 4. Withdrawing from an account
 ```sh
-curl -X POST \
+curl -w"\n" -X POST \
   http://localhost:9000/v1/account/1/withdraw \
   -H 'x-request-id: abc-pqr' \
   -H 'content-type: application/json' \
   -d '{"currencyType" : "INR", "value" : 1000}'
 ```
 
-5. Transfering to other account
+5. Transferring to other account
 ```sh
-curl -X POST \
+curl -w"\n" -X POST \
   http://localhost:9000/v1/transaction/transfer \
   -H 'content-type: application/json' \
   -H 'x-request-id: abc-pqr-xyz' \
@@ -75,7 +85,7 @@ curl -X POST \
 
 6. Viewing account Statment
 ```sh
-curl -X GET \
+curl -w"\n" -X GET \
   http://localhost:9000/v1/account/1/statement \
   -H 'content-type: application/json'  
 ```

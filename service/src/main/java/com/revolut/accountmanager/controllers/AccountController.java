@@ -7,6 +7,7 @@ import com.revolut.model.requests.AccountDepositRequest;
 import com.revolut.model.requests.AccountRegisterRequest;
 import com.revolut.model.requests.AccountWithdrawRequest;
 import com.revolut.model.responses.AccountStatementResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -21,6 +22,7 @@ import static com.revolut.accountmanager.util.ResponseUtils.handleException;
 @Path("/v1/account")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Slf4j
 public class AccountController {
 
     @Inject
@@ -41,6 +43,7 @@ public class AccountController {
     @Path("/{accountId}")
     public Response view(@PathParam("accountId") @NotNull Integer accountId){
         try{
+            log.info("View request for id : {}", accountId);
             AccountView account = actionFactory.viewAccountAction().process(accountId);
             return Response.ok(account).build();
         }catch (Exception e){

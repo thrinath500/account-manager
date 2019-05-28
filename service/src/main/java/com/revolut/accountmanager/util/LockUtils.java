@@ -21,8 +21,8 @@ public class LockUtils {
                 lock.unlock();
             }
         }catch (InterruptedException ie){
-            log.error("Unable to acquire lock", ie);
-            throw new UnableToAcquireLockException("Unable to acquire lock after max waiting time");
+            log.error("Timeout while acquiring lock", ie);
+            throw new UnableToAcquireLockException("Timeout while acquiring lock");
         }
     }
 }

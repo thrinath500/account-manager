@@ -7,7 +7,9 @@ server:
   adminConnectors:
     - type: http
       port: 9001
-
+  requestLog:
+    appenders:
+      - type: console
 logging:
   level: INFO
   appenders:
@@ -15,3 +17,11 @@ logging:
       threshold: ALL
       timeZone: UTC
       target: stdout
+    - type: file
+      currentLogFilename: /var/log/com/revolut/accountmanager/app.log
+      threshold: ALL
+      archive: true
+      archivedLogFilenamePattern: /var/log/com/revolut/accountmanager/app-%d.log
+      archivedFileCount: 5
+      timeZone: UTC
+      logFormat: "%-5p [%d{ISO8601}] %c: %m%n%rEx"

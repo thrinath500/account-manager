@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.revolut.accountmanager.exception.UnableToAcquireLockException;
 import com.revolut.accountmanager.util.LockUtils;
+import com.revolut.model.RequestContainer;
 import com.revolut.model.entity.CurrencyType;
 import com.revolut.model.requests.AccountDepositRequest;
 import com.revolut.model.requests.MoneyTransferRequest;
@@ -80,6 +81,7 @@ public class MoneyTransferAction extends BaseAction<MoneyTransferRequest, Void> 
                     }catch (Exception e){
                         log.error("Withdrawal is success, where as deposit is failed.");
                         // Fixing the state. If some reason, this failed, we will have to reconcile by sidelining
+                        RequestContainer.set(RequestContainer.get() + "_REVERT");
                         fromAccount.depositRequestConsumer.accept(new AccountDepositRequest(transferRequest.getCurrencyType(),
                                 transferRequest.getValue()));
                     }
