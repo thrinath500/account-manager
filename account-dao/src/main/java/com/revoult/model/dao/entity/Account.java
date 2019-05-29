@@ -62,10 +62,10 @@ public class Account {
         @Override
         public void accept(AccountDepositRequest accountDepositRequest) {
             if(isAlreadyExecuted()){
-                log.warn("RequestId is already processed " + RequestContainer.get());
+                log.warn("RequestId is already processed : {}", RequestContainer.get());
                 return;
             }
-
+            log.info("Depositing into account : {}", accountId);
             CurrencyType type = accountDepositRequest.getCurrencyType();
             balance.putIfAbsent(type, new BigDecimal(0).setScale(2, BigDecimal.ROUND_UP));
             balance.put(type, balance.get(type).add(accountDepositRequest.getValue()).setScale(2, BigDecimal.ROUND_UP));
@@ -82,7 +82,7 @@ public class Account {
                 log.warn("RequestId is already processed " + RequestContainer.get());
                 return;
             }
-
+            log.info("Withdrawing from account : {}", accountId);
             CurrencyType type = withdrawRequest.getCurrencyType();
             BigDecimal value = withdrawRequest.getValue();
 

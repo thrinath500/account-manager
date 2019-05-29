@@ -79,7 +79,7 @@ public class MoneyTransferAction extends BaseAction<MoneyTransferRequest, Void> 
                         toAccount.depositRequestConsumer.accept(new AccountDepositRequest(transferRequest.getCurrencyType(),
                                 transferRequest.getValue()));
                     }catch (Exception e){
-                        log.error("Withdrawal is success, where as deposit is failed.");
+                        log.error("Withdrawal is success, where as deposit is failed. Reverting it");
                         // Fixing the state. If some reason, this failed, we will have to reconcile by sidelining
                         RequestContainer.set(RequestContainer.get() + "_REVERT");
                         fromAccount.depositRequestConsumer.accept(new AccountDepositRequest(transferRequest.getCurrencyType(),

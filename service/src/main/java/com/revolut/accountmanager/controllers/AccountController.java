@@ -57,6 +57,7 @@ public class AccountController {
                             @PathParam("accountId") Integer accountId,
                             @Valid AccountDepositRequest accountDepositRequest){
         try{
+            log.info("View request for id : {}", accountId);
             RequestContainer.set(requestId);
             AccountView account = actionFactory.accountDepositAction(accountId).process(accountDepositRequest);
             return Response.ok(account).build();

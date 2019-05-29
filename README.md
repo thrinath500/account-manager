@@ -20,7 +20,7 @@ ThreadLocal maintaining Idempotency acroos same requests [RequestContainer.class
 5. Junit - Test cases. Intentionally not used Mockito & PowerMockito Frameworks, to keep it lightweight
 
 ### Build steps:
-Maven project. Uses dependncy management to maintain the same versions across all child modules
+Maven project. Uses dependency management to maintain the same versions across all child modules
 Whole project is bundled into one single jar using shade plugin
 JDK version is 1.8
 
@@ -33,7 +33,7 @@ mvn clean install
 ### Run steps:
 
 ```sh
-mkdir -p /var/log/com/revolut/accountmanager/
+sudo mkdir -pm 775 /tmp/com/revolut/accountmanager/
 java -cp service/target/service-1.0-SNAPSHOT.jar com.revolut.accountmanager.AccountManagerService server service/service.yml
 ```
 
@@ -44,7 +44,7 @@ Service starts up with default test data. However you can load your test data ag
 1. Registering a account
 
 ```sh
-curl -w"\n" -X PUT \
+curl -w"\n" -iX PUT \
   http://localhost:9000/v1/account/ \
   -H 'content-type: application/json' \
   -d '{"firstName" : "Thrinath2","lastName":"Dosapati2","address" : "Banglore"}'
@@ -52,7 +52,7 @@ curl -w"\n" -X PUT \
 
 2. Depositing to an account
 ```sh
-curl -w"\n" -X POST \
+curl -w"\n" -iX POST \
   http://localhost:9000/v1/account/1/deposit \
   -H 'content-type: application/json' \
   -H 'x-request-id: 123' \
@@ -61,13 +61,13 @@ curl -w"\n" -X POST \
 
 3. Viewing an account
 ```sh
-curl -w"\n" -X GET http://localhost:9000/v1/account/1 \
+curl -w"\n" -iX GET http://localhost:9000/v1/account/1 \
   -H 'content-type: application/json' 
 ```
 
 4. Withdrawing from an account
 ```sh
-curl -w"\n" -X POST \
+curl -w"\n" -iX POST \
   http://localhost:9000/v1/account/1/withdraw \
   -H 'x-request-id: abc-pqr' \
   -H 'content-type: application/json' \
@@ -76,7 +76,7 @@ curl -w"\n" -X POST \
 
 5. Transferring to other account
 ```sh
-curl -w"\n" -X POST \
+curl -w"\n" -iX POST \
   http://localhost:9000/v1/transaction/transfer \
   -H 'content-type: application/json' \
   -H 'x-request-id: abc-pqr-xyz' \
@@ -85,7 +85,7 @@ curl -w"\n" -X POST \
 
 6. Viewing account Statment
 ```sh
-curl -w"\n" -X GET \
+curl -w"\n" -iX GET \
   http://localhost:9000/v1/account/1/statement \
   -H 'content-type: application/json'  
 ```

@@ -9,19 +9,21 @@ server:
       port: 9001
   requestLog:
     appenders:
-      - type: console
+      - type: file
+        currentLogFilename: /tmp/com/revolut/accountmanager/access.log
+        threshold: ALL
+        archive: true
+        archivedLogFilenamePattern: /tmp/com/revolut/accountmanager/access.%d.log.gz
+        archivedFileCount: 5
 logging:
-  level: INFO
   appenders:
-    - type: console
-      threshold: ALL
-      timeZone: UTC
-      target: stdout
-    - type: file
-      currentLogFilename: /var/log/com/revolut/accountmanager/app.log
-      threshold: ALL
-      archive: true
-      archivedLogFilenamePattern: /var/log/com/revolut/accountmanager/app-%d.log
-      archivedFileCount: 5
-      timeZone: UTC
-      logFormat: "%-5p [%d{ISO8601}] %c: %m%n%rEx"
+    - type : console
+    - archivedFileCount: 3
+      currentLogFilename: /tmp/com/revolut/accountmanager/app.log
+      archivedLogFilenamePattern: /tmp/com/revolut/accountmanager/app.log-%d{yyyy-MM-dd}-%i.log.gz
+      logFormat: "%-6level [%d{HH:mm:ss.SSS}] [%t] %logger{5} - %X{code} %msg %n"
+      maxFileSize: 200MB
+      threshold: INFO
+      timeZone: IST
+      type: file
+  level: DEBUG
