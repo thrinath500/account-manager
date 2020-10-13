@@ -28,7 +28,7 @@
         <lombok.version>1.16.4</lombok.version>
         <guice.version>4.0</guice.version>
         <guava.version>18.0</guava.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <jdk.version>1.8</jdk.version>
     </properties>
 
